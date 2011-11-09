@@ -1,6 +1,6 @@
 #TODO: where should this live?
 at_exit do
-  Pakyow.app.app_cache.teardown 
+  Pakyow.app.app_cache.teardown if Configuration::Base.app.cache 
 end
 
 module Pakyow

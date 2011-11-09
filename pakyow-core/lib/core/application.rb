@@ -107,7 +107,7 @@ module Pakyow
         self.builder.use(Pakyow::Static) if Configuration::Base.app.static
         self.builder.use(Pakyow::Logger) if Configuration::Base.app.log
         self.builder.use(Pakyow::Reloader) if Configuration::Base.app.auto_reload
-        self.builder.use(Pakyow::Cache)
+        self.builder.use(Pakyow::Cache) if Configuration::Base.app.cache
         
         @prepared = true
 
@@ -139,6 +139,7 @@ module Pakyow
     include Helpers
 
     attr_accessor :request, :response, :presenter, :route_store, :restful_routes, :handler_store
+    attr_reader :app_cache
 
     def initialize
       Pakyow.app = self
@@ -158,10 +159,6 @@ module Pakyow
       @app_cache = ApplicationCache.new
     end
 
-    def app_cache
-      @app_cache
-    end
-    
     def cache
       CacheDirective.new(self.request)
     end

@@ -5,7 +5,7 @@ module Pakyow
         attr_accessor :dev_mode, :log, :public_dir, :root, :log_dir, 
         :presenter, :default_action, :ignore_routes, :error_level, 
         :default_environment, :application_path, :log_name, :src_dir,
-        :auto_reload, :errors_in_browser, :static
+        :auto_reload, :errors_in_browser, :static, :cache
         
         # Displays development-specific warnings.
         #
@@ -75,6 +75,10 @@ module Pakyow
         #
         def static
           @static || true
+        end
+
+        def cache
+          @cache || false
         end
       end
     end
