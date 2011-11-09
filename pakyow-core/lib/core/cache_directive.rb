@@ -4,7 +4,6 @@ module Pakyow
 
     def initialize(request)
       @request = request
-      pp request.path
       @path = request.path
 
       @versions = []
