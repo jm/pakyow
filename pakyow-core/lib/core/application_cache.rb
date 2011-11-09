@@ -109,7 +109,6 @@ module Pakyow
     end
 
     def teardown
-      #TODO: why is there a nokogiri document object in the store?
       @cache.set "_cache_store", @cache_store
     end
     
@@ -129,10 +128,11 @@ module Pakyow
           r = Request.new(env)
           
           c[:versions].each do |v|
-            key << r.send(v.keys.first)[v.values.first]
+            next unless val = r.send(v.keys.first)[v.values.first]
+            key << val 
           end
         end
-       
+      
         @cache.get key
       rescue
         puts 'Cache not found'

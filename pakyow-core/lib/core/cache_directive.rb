@@ -15,9 +15,10 @@ module Pakyow
 
     def key
       key = @path.dup
-
+      
       if @versions && !@versions.empty?
         @versions.each do |v|
+          next if @request.route_spec.include?(":#{v.values.first}")
           next unless val = @request.send(v.keys.first)[v.values.first]
           key << val 
         end
