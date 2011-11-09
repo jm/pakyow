@@ -1,6 +1,3 @@
-#TODO: rebuild cache after invalidating
-#TODO: figure out how to cache partial responses (does this even make sense?)
-
 #TODO: where should this live?
 at_exit do
   Pakyow.app.app_cache.teardown 
@@ -25,8 +22,22 @@ module Pakyow
           key = d.key 
           puts "Storing #{key}"
           @cache.set key, data
+         
+          env = {
+            'PATH_INFO' => d.request.env['PATH_INFO'],
+            'REQUEST_METHOD' => d.request.env['REQUEST_METHOD'],
+            'QUERY_STRING' => d.request.env['QUERY_STRING'],
+            'rack.request.query_string' => d.request.env['rack.request.query_string'],
+            'rack.request.query_hash' => d.request.env['rack.request.query_hash']
+          }
           
-          @cache_store << { :key => key, :path => d.path, :versions => d.versions, :constraints => d.constraints } 
+          @cache_store << { 
+            :key => key, 
+            :path => d.path, 
+            :versions => d.versions, 
+            :constraints => d.constraints,
+            :env => env
+          }
         rescue Memcached::ServerIsMarkedDead
           #TODO: only attempt reconnecting a set number of times
           puts "Failed... reconnecting"
@@ -36,6 +47,7 @@ module Pakyow
         end
       end
       
+      to_rebuild = []
       @directives[:invalidate].each do |d|
         invalid_caches = @cache_store
         
@@ -51,12 +63,35 @@ module Pakyow
           invalid_caches = invalid_caches.select { |x| !(x[:versions] - v).nil? }
         end
 
+        to_rebuild = invalid_caches.dup
+        
+        # invalidate (deletes caches from memcached and the store)
         invalid_caches.each do |c|
           self.invalidate_key c[:key]
         end
       end
 
       @directives = { :store => [], :invalidate => [] }
+
+      unless to_rebuild.empty?
+        # rebuild caches
+        thread = Thread.new do
+          cache = @cache.clone
+         
+          to_rebuild.each do |c|
+            env = Pakyow.app.request.env.dup.merge(c[:env])
+
+            #TODO: use clone of application
+            Pakyow.app.call(env)
+            Pakyow.app.app_cache.finalize([Pakyow.app.response.status, Pakyow.app.response.header, Pakyow.app.response.body])
+          end
+        end
+
+        thread.join
+      end
+    rescue StandardError => e
+      pp e
+      pp e.backtrace
     end
 
     def invalidate_key(key, del = true)
@@ -74,6 +109,7 @@ module Pakyow
     end
 
     def teardown
+      #TODO: why is there a nokogiri document object in the store?
       @cache.set "_cache_store", @cache_store
     end
     

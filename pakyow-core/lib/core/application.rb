@@ -100,7 +100,7 @@ module Pakyow
       # of the application.
       def prepare(args)
         self.load_config args.empty? || args.first.nil? ? [Configuration::Base.app.default_environment] : args
-        return if prepared?
+        # return if prepared?
 
         self.builder.use(Rack::MethodOverride)
         self.builder.instance_eval(&self.middleware_proc) if self.middleware_proc

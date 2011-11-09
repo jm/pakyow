@@ -4,7 +4,8 @@ module Pakyow
 
     def initialize(request)
       @request = request
-      @path = request.env['PATH_INFO']
+      pp request.path
+      @path = request.path
 
       @versions = []
       @constraints = []
@@ -17,6 +18,7 @@ module Pakyow
 
       if @versions && !@versions.empty?
         @versions.each do |v|
+          #TODO fix error for post
           key << @request.send(v.keys.first)[v.values.first]
         end
       end
