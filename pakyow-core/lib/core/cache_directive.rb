@@ -18,8 +18,8 @@ module Pakyow
 
       if @versions && !@versions.empty?
         @versions.each do |v|
-          #TODO fix error for post
-          key << @request.send(v.keys.first)[v.values.first]
+          next unless val = @request.send(v.keys.first)[v.values.first]
+          key << val 
         end
       end
 
