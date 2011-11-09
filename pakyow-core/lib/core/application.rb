@@ -107,6 +107,7 @@ module Pakyow
         self.builder.use(Pakyow::Static) if Configuration::Base.app.static
         self.builder.use(Pakyow::Logger) if Configuration::Base.app.log
         self.builder.use(Pakyow::Reloader) if Configuration::Base.app.auto_reload
+        self.builder.use(Pakyow::Cache)
         
         @prepared = true
 
@@ -152,6 +153,17 @@ module Pakyow
 
       # Load application files
       load_app(false)
+      load_app
+
+      @app_cache = ApplicationCache.new
+    end
+
+    def app_cache
+      @app_cache
+    end
+    
+    def cache
+      CacheDirective.new(self.request)
     end
 
     # Interrupts the application and returns response immediately.
@@ -224,6 +236,8 @@ module Pakyow
     # Called on every request.
     #
     def call(env)
+      @cache = false
+      
       self.request = Request.new(env)
       self.response = Rack::Response.new
       self.request.working_path = self.request.path

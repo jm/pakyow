@@ -23,8 +23,8 @@ module Pakyow
       
       ended_at = Time.now.to_f
       difference = ((ended_at - began_at.to_f) * 1000).to_f
-
-      Log.enter "Completed in #{difference}ms | #{Pakyow.app.response.status} | [#{Pakyow.app.request.url}]"
+      
+      Log.enter "Completed in #{difference}ms | #{result.first} | [#{env['REQUEST_URI']}]"
       Log.enter
       
       result

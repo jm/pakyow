@@ -7,6 +7,7 @@ require 'rack'
 require 'rack/file'
 require 'logger'
 require 'cgi'
+require 'memcached'
 
 # Base
 autoload :Pakyow, 'core/base'

@@ -10,6 +10,9 @@ module Pakyow
   autoload :Logger,         'core/logger'
   autoload :Static,         'core/static'
   autoload :Reloader,       'core/reloader'
+  autoload :Cache,          'core/middleware/cache'
+  autoload :CacheDirective, 'core/cache_directive'
+  autoload :ApplicationCache, 'core/application_cache'
 
   # utils
   autoload :StringUtils,    'utils/string'
