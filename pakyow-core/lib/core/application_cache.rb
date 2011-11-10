@@ -87,7 +87,7 @@ module Pakyow
           end
         end
 
-        thread.join
+        # thread.join
       end
     rescue StandardError => e
       pp e
